@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de CEP</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Estilo customizado -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center">Buscar por CEP</h1>
+    
+    <!-- Formulário de busca -->
+    <form id="cep-form">
+        <div class="form-group">
+            <label for="cep">Digite o CEP:</label>
+            <input type="text" class="form-control" id="cep" placeholder="00000-000" required>
+        </div>
+        <!-- Botão de busca -->
+        <button type="submit" id="address-btn" class="btn btn-primary btn-sm">Buscar</button>
+    </form>
+
+    <!-- Área para exibir informações do endereço -->
+    <div id="address-info" class="mt-4"></div>
+
+    <!-- Incluindo jQuery e Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script JavaScript -->
+    <script>
+        document.getElementById('cep-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede o comportamento padrão do formulário
+            
+            const cep = document.getElementById('cep').value.replace('-', ''); // Remove o hífen
+            const addressInfoDiv = document.getElementById('address-info');
+
+            // Requisição para o endpoint (ajuste a URL conforme necessário)
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na solicitação');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.erro) {
+                        addressInfoDiv.innerHTML = `<div class="alert alert-danger">CEP não encontrado</div>`;
+                    } else {
+                        addressInfoDiv.innerHTML = `
+                            <div class="alert alert-success">
+                                <p><strong>Endereço:</strong> ${data.logradouro}</p>
+                                <p><strong>Bairro:</strong> ${data.bairro}</p>
+                                <p><strong>Cidade:</strong> ${data.localidade}</p>
+                                <p><strong>Estado:</strong> ${data.uf}</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    addressInfoDiv.innerHTML = `<div class="alert alert-danger">Erro na solicitação</div>`;
+                    console.error('Erro:', error);
+                });
+        });
+    </script>
+</div>
+</body>
+</html>
+
+
+
